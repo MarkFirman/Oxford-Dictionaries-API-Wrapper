@@ -7,7 +7,7 @@ include_once './dictionary.class.php';
 
 /* Initialise the dictionary class */
 /* You must supply your app_key, app_id and language - in that order */
-$dictionary = new dictionary("14bb70b0cc15bb7d5a8e5f7d73c65c40", "cc7f39ed", "en");
+$dictionary = new dictionary("YOUR APP KEY", "YOUR APP ID", "en");
 
 /* After the dictionary class has been initialised, you must pass a word to the dictionary, like so: */
 $dictionary->getWord("pizza");
