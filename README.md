@@ -6,6 +6,8 @@ PHP wrapper to communicate with the Oxford Dictionary API
 
 # To Do
 - Auto check the validity of returned data to prevent errors appearing. (Short fix: `error_reporting(0);`)
+- Boolean function to determine if word is valid
+- Better error reporting - currently relies on server defaults
 
 # How to
 - Check the `test.php` file to see how to implement the Oxford Dictionary API => `dictionary.class.php` or follow the instructions below:
