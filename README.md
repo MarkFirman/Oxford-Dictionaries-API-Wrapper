@@ -10,6 +10,7 @@ PHP wrapper to communicate with the Oxford Dictionary API. This wrapper will onl
 
 # To Do
 - Boolean function to determine if word is valid
+- Convert inflections. Some words are inflections, e.g., running, which don’t have an entry in the dictionary of their own. In this case, we should use the Lemmas endpoint to retrieve the root form, which converts the word to something useable, e.g., running becomes run.
 
 # How to
 - Check the `test.php` file to see how to implement the Oxford Dictionary V2 API => `dictionary.class.php` or follow the instructions below:
