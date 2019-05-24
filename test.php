@@ -1,30 +1,39 @@
 <?php
-/* Turn off error reporting */
-error_reporting(0);
-
+/***********************************************************************
+* # @Author Mark Firman
+* # @Project Dictionary API V2
+* # @Date 23/05/2019
+* # @Email info@markfirman.co.uk
+* # @Last Modified 24/05/2019
+*/
+ 
 /* Include the dictionary class */
-include_once './dictionary.class.php';
+include_once 'dictionary.class.php';
 
-/* Initialise the dictionary class */
-/* You must supply your app_key, app_id and language - in that order */
-$dictionary = new dictionary("YOUR APP KEY", "YOUR APP ID", "en");
+/* Create a new instance of the dictionary class */
+$dictionary = new Dictionary("APP ID", "APP KEY", "en-gb");
 
-/* After the dictionary class has been initialised, you must pass a word to the dictionary, like so: */
-$dictionary->getWord("pizza");
+/* Send new word request to the dictionary */
+$dictionary->queryWord("Bark");
 
-/* Now you can get attributes of the word, including origin, definition ect using inbuilt functions */
-echo "SAMPLE FUNCTIONS:";
-echo "<br>PROVIDER: ".$dictionary->getProvider();
-echo "<br>LANGUAGE: ".$dictionary->getLanguage();
-echo "<br>DERIVATIVE: ".$dictionary->getDerivative();
-echo "<br>ORIGIN: ".$dictionary->getOrigin();
-echo "<br>DEFINITION: ".$dictionary->getDefinition();
-echo "<br>SHORT DEFINITION: ".$dictionary->getShortDefinition();
-echo "<br>EXAMPLE TEXT: ".$dictionary->getExampleText();
-echo "<br>AUDIO FILE (URL): ".$dictionary->getAudioFile()."<audio controls><source src='".$dictionary->getAudioFile()."' type='audio/mpeg'>Your browser does not support HTML audio</audio></br>";
+/* Set the result to use - some words might have multiple meanings - use this method to switch between different meanings */
+/* This is only required if you want to specify a result set other than the default */
+/* If you specify a result set that does not exist, it will default to 0 */
+$dictionary->setResult(0);
 
-/* You can also call results explicity. To do so, you must store the result of getWord() and use it as an array */
-$result = $dictionary->getWord("car");
-echo "Definition of car, called explicitly: ".$result->results[0]->lexicalEntries[0]->entries[0]->senses[0]->definitions[0]; // Returns the first definition of the word 'car' 
+/* Get results from dictionary class */
+echo "<h1>Dictionary Class Results - ".$dictionary->getWord()."</h1>";
+echo "<b>Word:</b> ".$dictionary->getWord();
+echo "<br><b>Definition:</b> ".$dictionary->getDefinition();
+echo "<br><b>Short Definition:</b> ".$dictionary->getShortDefinition();
+echo "<br><b>Example:</b> ".$dictionary->getExample();
+echo "<br><b>Lexical:</b> ".$dictionary->getLexical();
+echo "<br><b>Phonetic:</b> ".$dictionary->getPhonetic();
+echo "<br><b>Origin:</b> ".$dictionary->getOrigin();
+echo "<br><b>Language:</b> ".$dictionary->getLanguage();
+echo "<br><b>Audio:</b> <audio controls><source src='".$dictionary->getAudio()."' type='audio/mpeg'>Your browser does not support HTML audio</audio><br>";
+
+/* Displays the current result set */
+echo "<br></br>Using result set: <b>".$dictionary->selected_result."</b>";
 
 ?>
