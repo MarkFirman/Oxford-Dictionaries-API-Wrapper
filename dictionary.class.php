@@ -65,7 +65,7 @@ class Dictionary {
 	/// =====================================================================================
 	
 	///=====================================================================================
-	/// DICTIONARY : Use these methods to send and recieve data between server and API
+	/// DICTIONARY : Use these methods to send and recieve dictionary requests
 	/// =====================================================================================
 	/// =====================================================================================
 	/// newDictionaryRequest() : initiates a new API request to pull dictionary data
@@ -286,12 +286,17 @@ class Dictionary {
 	}
 	
 	///=====================================================================================
-	/// INFLECTIONS : Use these methods to send and recieve data between server and API
+	/// INFLECTIONS : Use these methods to send and recieve inflection requests
 	/// =====================================================================================
 	/// COMING SOON
 	
 	///=====================================================================================
-	/// THESAURUS : Use these methods to send and recieve data between server and API
+	/// THESAURUS : Use these methods to send and recieve thesaurus requests
+	/// =====================================================================================
+	/// COMING SOON
+	
+	///=====================================================================================
+	/// THESAURUS : Use these methods to send and recieve translation requests
 	/// =====================================================================================
 	/// COMING SOON
 	
