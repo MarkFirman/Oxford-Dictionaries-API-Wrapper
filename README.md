@@ -9,8 +9,7 @@ PHP wrapper to communicate with the Oxford Dictionary API. This wrapper will onl
 - Iterate through result sets (where words have more than 1 definition eg 'bark')
 
 # To Do
-- Boolean function to determine if word is valid
-- Convert inflections. Some words are inflections, e.g., running, which don’t have an entry in the dictionary of their own. In this case, we should use the Lemmas endpoint to retrieve the root form, which converts the word to something useable, e.g., running becomes run.
+- Convert inflections. Some words are inflections (eg; running) which don’t have an entry in the dictionary of their own. In this case, we should use the Lemmas endpoint to retrieve the root form, which converts the word to something useable, e.g., running becomes run.
 - Translations
 - Thesaurus
 
@@ -22,6 +21,6 @@ PHP wrapper to communicate with the Oxford Dictionary API. This wrapper will onl
 3. Include the `dictionary.class.php` file using `include_once './dictionary.class.php';`
 4. Initialise a new instance of the dictionary: `$dictionary = new dictionary("YOUR APP ID", "YOUR APP KEY", "LANGUAGE");`
 5. For a list of supported languages please see https://developer.oxforddictionaries.com/documentation/languages
-6. Pass a word to the dictionary: `$dictionary->getWord("pizza");`
+6. Pass a word to the dictionary: `$dictionary->newDictionaryRequest("pizza");`
 7. Choose the result set to use (this step is optional. If not used, the default (first) result set will be used) `$dictionary->setResult(1);`
 8. Use the class functions to return data: `echo $dictionary->getDefinition();`
