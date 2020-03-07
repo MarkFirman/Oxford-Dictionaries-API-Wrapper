@@ -1,8 +1,8 @@
-# Oxford-Dictionaries-API-Wrapper V2
-PHP wrapper to communicate with the Oxford Dictionary API. This wrapper will only work with V2 of the oxford API (V1 will be deprecated from June 2019 - so I have removed support from here also)
+# Oxford Dictionaries PHP API Wrapper 
+PHP wrapper to communicate with the Oxford Dictionary API. This wrapper will only work with V2 of the oxford API.
 
 # Features
-- Easily obtain definitions, derivatives, origins, example text and audio pronunciations for a specified word
+- Easily obtain definitions, derivatives, origins, example text, phonetics, lexical entries and audio pronunciations for a specified word
 
 # New Features (V2)
 - Better error reporting/handling
