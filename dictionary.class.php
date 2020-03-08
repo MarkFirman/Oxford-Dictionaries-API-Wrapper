@@ -3,7 +3,7 @@
  * # @Author Mark Firman
  * # @Project Dictionary API V2
  * # @Date 23/05/2019
- * # @Email info@markfirman.co.uk
+ * # @Email mark.firman@me.com
  * # @Last Modified 07/03/2020
  */
 
@@ -23,13 +23,17 @@ class Dictionary {
 	public $json_data;
 	// The result array
 	public $result;
+	
 	// The selected result set
 	public $selected_result;
 	// Total number of available results in current result set
 	public $num_returned_results;
 	
 	/// Class variables
+	// Holds the last quieried word
 	public $word;
+	
+	/// Dictionary variables
 	public $definition;
 	public $shortDefinition;
 	public $example;
@@ -39,12 +43,29 @@ class Dictionary {
 	public $origin;
 	public $language;
 	
+	/// Thesaurus variables
+	public $synonyms;
+	public $antonyms;
+	
+	/// Inflection variables
+	public $inflections;
+	
+	/// Translation variables
+	public $translations;
+	
+	/// Types of API entries defined as const
+	private $type;
+	const DICTIONARY = 'dictionary';
+	const THESAURUS = 'thesaurus';
+	const TRANSLATION = 'translation';
+	const INFLECTION = 'inflection';
+
 	/// Error handling
 	// Holds status' and errors
 	public $errors;
 	// Determines whether errors are shown
 	public $show_errors;
-	// The local audio file to use if audio from Oxford cannot be found
+	// The local audio file to use if audio pronunciation cannot be found
 	public $no_audio_file = "./no_audio.mp3";
 	
 	/// =====================================================================================
@@ -74,53 +95,14 @@ class Dictionary {
 	/// =====================================================================================
 	public function newDictionaryRequest($_word, $_lang = null){
 		
-		// Store the new word
-		$this->word = strtolower($_word);
+		// Set the type to dictionary
+		$this->type = self::DICTIONARY;
 		
-		// Check if there is a value in $_lang
-		// If so, we need to ensure we use the language requested
-		$this->API_LANG = ($_lang == null ? $this->API_LANG : $_lang);
+		// Perform API request
+		return $this->requestAPI($_word, $_lang, $this->API_URL."/entries/".$this->API_LANG."/".$_word);
 		
-		// Create HTTP header array
-		// This is the HTTP header thats sent to the API URL when the request takes place
-		// The APP ID and KEY are used here to authenticate the requested - an Oxford Dictionaries user account is required
-		// (https://developer.oxforddictionaries.com/)
-		$options = array(
-				'http' => array(
-						'method' => "GET",
-						'header' => "app_id:".$this->APP_ID."\r\n" .
-									"app_key:".$this->APP_KEY."\r\n" .
-									"Content-Type: application/json"
-								
-			)
-		);
-		
-		// Perform request
-		$context = stream_context_create($options);
-		
-		// Store the request result
-		$result = @file_get_contents($this->API_URL."/entries/".$this->API_LANG."/".$this->word, false, $context);
-		
-		// Check the returned status of the request and handle any errors
-		$this->handleRequestStatus($http_response_header[0]);
-	
-		// Store the RAW json data
-		// This allows the use of raw queries
-		$this->json_data = json_decode($result);
-		
-		// Check how many results are returned
-		// Some words may have multiple definitions and therefor mulitple result sets
-		// An example of a word with multiple definitions : Bark - the stuff on trees or the noise a dog makes
-		$this->checkNumberOfResultSets();
-		
-		// Force the JSON array to be decoded
-		// This extracts the data from the returned JSON array into the class variables
-		$this->decodeDictionaryData();
-		
-		// Return the raw JSON data so that direct calls can be made
-		return json_decode($result);
 	}
-
+	
 	/// =====================================================================================
 	/// changeDictionaryResultSet() : change the result set to use
 	/// Some words in the dictionary have more than 1 entry available - use this method to cycle results
@@ -265,8 +247,8 @@ class Dictionary {
 	}
 	
 	/// =====================================================================================
-	/// getOrigin() : returns the origin of the current word
-	/// $result_set  : to specify the origin to return
+	/// getOrigin() : Returns the origin of the current word
+	/// $result_set  : To specify the origin to return
 	/// If origin cannot be found using the provided count then the first element in the result array is used
 	/// =====================================================================================
 	public function getOrigin($result_set = 0){
@@ -288,17 +270,42 @@ class Dictionary {
 	///=====================================================================================
 	/// INFLECTIONS : Use these methods to send and recieve inflection requests
 	/// =====================================================================================
-	/// COMING SOON
+	public function newInflectionRequest($_word, $_lang = null){
+		
+		// Set the type to inflection
+		$this->type = self::INFLECTION;
+		
+		// Perform the API request
+		return $this->requestAPI($_word, $_lang, $this->API_URL."/inflections/".$this->API_LANG."/".$_word);
+		
+	}
 	
 	///=====================================================================================
 	/// THESAURUS : Use these methods to send and recieve thesaurus requests
+	/// $_word	  : Find words that are similar or opposite in meaning to the input word
 	/// =====================================================================================
-	/// COMING SOON
+	public function newThesaurusRequest($_word, $_lang = null){
+		
+		// Set the type to thesaurus
+		$this->type = self::THESAURUS;
+		
+		// Perform the API request
+		return $this->requestAPI($_word, $_lang, $this->API_URL."/thesaurus/".$this->API_LANG."/".$_word);
+	}
 	
 	///=====================================================================================
-	/// THESAURUS : Use these methods to send and recieve translation requests
+	/// TRANSLATION : Use these methods to send and recieve translation requests
+	/// $_word		: The word to translate
+	/// $_lang      : The target translation language. The current language is used as the source language
 	/// =====================================================================================
-	/// COMING SOON
+	public function newTranslationRequest($_word, $_lang){
+		
+		// Set the type to translation
+		$this->type = self::TRANSLATION;
+		
+		// Perform the API request
+		return $this->requestAPI($_word, $this->API_LANG, $this->API_URL."/translations/".$this->API_LANG."/".$_lang."/".$_word);
+	}
 	
 	///=====================================================================================
 	/// PRIVATE METHODS : Used soley by the class, the user will never need to call the below
@@ -324,7 +331,7 @@ class Dictionary {
 				$this->errors['status'] = 400;
 				$this->errors['message'] = "Bad Request";
 			break;
-			// 403 : Authenticated failed (APP ID or KEY incorrect)
+			// 403 : Authentication failed (APP ID or KEY incorrect)
 			case 403:
 				$this->errors['status'] = 403;
 				$this->errors['message'] = "Authentication failed";
@@ -359,6 +366,12 @@ class Dictionary {
 				$this->errors['status'] = 504;
 				$this->errors['message'] = "Gateway timeout";
 			break;
+		}
+		
+		// The request returned an error status
+		// Check if errors are turned on
+		if($this->show_errors && $this->errors['status'] != 200){
+			echo "An error occured: ".$this->errors['status']. " - ".$this->errors['message'];
 		}
 	}
 	
@@ -431,17 +444,126 @@ class Dictionary {
 				// Increment the counter
 				$counter++;
 			}
+		} 
+	}
+	
+	/// =====================================================================================
+	/// decodeInflectionData() : Decodes the inflection JSON data
+	/// =====================================================================================
+	private function decodeInflectionData(){
+		
+		// Check the status of the request
+		// Anything other than 200 is a bad request
+		// We do not want to waste resources attemping to decode JSON that is invalid
+		if($this->errors['status'] == 200){
 			
-		} else {
-			
-			// The request returned an error status
-			// Check if errors are turned on
-			if($this->show_errors){
-				echo "An error occured: ".$this->errors['status']. " - ".$this->errors['message'];
+			// Iterate through results
+			for($i = 0; $i < count($this->json_data->results[0]->lexicalEntries); $i++){
+				
+				// Store the inflection in the class variable
+				$this->inflections[$i] = ($this->json_data->results[0]->lexicalEntries[$i]->inflections[0]->inflectedForm == $this->word ? $this->json_data->results[0]->lexicalEntries[$i]->inflections[1]->inflectedForm : $this->json_data->results[0]->lexicalEntries[$i]->inflections[0]->inflectedForm);
 			}
-			
 		}
 		
+		
+	}
+	
+	/// =====================================================================================
+	/// decodeTranslationData() : Decodes the inflection JSON data
+	/// =====================================================================================
+	private function decodeTranslationData(){
+		
+		// Check the status of the request
+		// Anything other than 200 is a bad request
+		// We do not want to waste resources attemping to decode JSON that is invalid
+		// Store the translation in the class variable
+		$this->translations = $this->json_data->results[0]->lexicalEntries[0]->entries[0]->senses[0]->translations[0]->text;
+			
+	}
+	
+	/// =====================================================================================
+	/// decodeThesaurusData() : Decodes the inflection JSON data
+	/// =====================================================================================
+	private function decodeThesaurusData(){
+		
+	}
+	
+	/// =====================================================================================
+	/// requestAPI() : Performs the actual API request
+	/// =====================================================================================
+	private function requestAPI($_word, $_lang = null, $_url){
+		
+		// Store the new word
+		$this->word = strtolower($_word);
+		
+		// Check if there is a value in $_lang
+		// If so, we need to ensure we use the language requested
+		$this->API_LANG = ($_lang == null ? $this->API_LANG : $_lang);
+		
+		// Create HTTP header array
+		// This is the HTTP header thats sent to the API URL when the request takes place
+		// The APP ID and KEY are used here to authenticate the requested - an Oxford Dictionaries user account is required
+		// (https://developer.oxforddictionaries.com/)
+		$options = array(
+				'http' => array(
+						'method' => "GET",
+						'header' => "app_id:".$this->APP_ID."\r\n" .
+									"app_key:".$this->APP_KEY."\r\n" .
+									"Content-Type: application/json"
+								
+			)
+		);
+		
+		// Create the request stream
+		$context = stream_context_create($options);
+		
+		// Perform the request
+		$result = @file_get_contents($_url, false, $context);
+		
+		// Check the returned status of the request and handle any errors
+		$this->handleRequestStatus($http_response_header[0]);
+	
+		// Store the RAW json data
+		// This allows the use of raw queries
+		$this->json_data = json_decode($result);
+
+		// Determine call type
+		switch($this->type){
+			
+			case self::DICTIONARY:
+			
+				// Check how many results are returned
+				// Some words may have multiple definitions and therefore mulitple result sets
+				// An example of a word with multiple definitions : Bark - the stuff on trees or the noise a dog makes
+				$this->checkNumberOfResultSets();
+				
+				// Force the dictionary JSON array to be decoded
+				// This extracts the data from the returned JSON array into the class variables
+				$this->decodeDictionaryData();
+			
+			break;
+			case self::INFLECTION:
+			
+				// Force the inflection JSON array to be decoded
+				$this->decodeInflectionData();
+			
+			break;
+			case self::THESAURUS:
+			
+				// Force the thesaurus JSON array to be decoded
+				$this->decodeThesaurusData();
+			
+			break;
+			case self::TRANSLATION:
+			
+				// Force the translation JSON array to be decoded
+				$this->decodeTranslationData();
+			
+			break;
+		}
+		
+		// Return the raw JSON data so that direct calls can be made
+		return $result;
 	}
 	
 }
