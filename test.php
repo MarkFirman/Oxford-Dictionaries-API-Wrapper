@@ -39,5 +39,25 @@ echo "<br></br>Using result set: <b>".$dictionary->selected_result."</b>";
 echo "<br></br>Total result sets available from request: <b>".$dictionary->num_returned_results."</b>";
 
 
+/// INFLECTION REQUEST - INFLECTIONS ONLY WORK WITH A DEVELOPER ACCOUNT
+/// If you have a prototype account you will recieve a 403 authentication failed message
+// Send a new inflection request to the API
+$dictionary->newInflectionRequest("run");
+
+// Get and display the results from the inflections request
+echo "<h1>Inflection Results - ".$dictionary->word."</h1>";
+// Display each inflection
+for($i = 0; $i < count($dictionary->inflections); $i++){
+	echo "<b>Inflection ".$i.": </b>".$dictionary->inflections[$i]."</i><br/>";
+}
+
+/// TRANSLATION REQUEST - TRANSLATIONS ONLY WORK WITH A DEVELOPER ACCOUNT
+/// If you have a prototype account you will recieve a 403 authentication failed message
+// Send a new translation request to the API where the first parameter is the word to translate and the second param is the translation language
+$dictionary->newTranslationRequest("hello", "es");
+
+// Get and display the results from the translation request
+echo "<h1>Translation Results - English word: '".$dictionary->word."' to Spanish</h1>";
+echo "<b>Translation:</b> ".$dictionary->translations."</i><br/>";
 
 ?>
