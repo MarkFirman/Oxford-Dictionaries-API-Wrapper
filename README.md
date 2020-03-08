@@ -3,15 +3,15 @@ PHP wrapper to communicate with the Oxford Dictionary API. This wrapper will onl
 
 # Features
 - Easily obtain definitions, derivatives, origins, example text, phonetics, lexical entries and audio pronunciations for a specified word
+- Get translations (Developer feature - wont work with prototype accounts)
+- Get inflections (Developer feature - wont work with prototype accounts)
 
 # New Features (V2)
 - Better error reporting/handling
 - Iterate through result sets (where words have more than 1 definition eg 'bark')
 
 # To Do
-- Convert inflections. Some words are inflections (eg; running) which don’t have an entry in the dictionary of their own. In this case, we should use the Lemmas endpoint to retrieve the root form, which converts the word to something useable, e.g., running becomes run.
-- Translations
-- Thesaurus
+-  Add thesaurus support
 
 # How to
 - Check the `test.php` file to see how to implement the Oxford Dictionary V2 API => `dictionary.class.php` or follow the instructions below:
@@ -24,3 +24,4 @@ PHP wrapper to communicate with the Oxford Dictionary API. This wrapper will onl
 6. Pass a word to the dictionary: `$dictionary->newDictionaryRequest("pizza");`
 7. Choose the result set to use (this step is optional. If not used, the default (first) result set will be used) `$dictionary->setResult(1);`
 8. Use the class functions to return data: `echo $dictionary->getDefinition();`
+9. Check out the test file to see examples using translations and inflections
